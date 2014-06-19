@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -15,8 +16,11 @@ namespace DataGridFocusedRowExample
     class ViewModel : ViewModelBase
     {
         private ObservableCollection<RowViewModel> _models;
+        public ObservableCollection<RowViewModel> ModelSource { get { return _models; } }
 
         public ICollectionView Models { get; set; }
+
+        public ICommand ClearContentCommand { get; set; }
 
         private string _filterString;
         public String FilterString { get { return _filterString; } set { _filterString = value; OnPropertyChanged("FilterString"); Models.Refresh(); } }
@@ -33,8 +37,22 @@ namespace DataGridFocusedRowExample
                 else return ((RowViewModel)item).Name.ToLower().Contains(_filterString.ToLower());
             };
 
+
+            ClearContentCommand = new RelayCommand(commandParameter => ((ObservableCollection<RowViewModel>)commandParameter).Clear(),
+                                                   commandParameter =>
+                                                   {
+                                                       var collection = commandParameter as ObservableCollection<RowViewModel>;
+                                                       if (collection == null) return false;
+                                                       return collection.Any();
+                                                   });
+
             Timer dt = new Timer(TimeSpan.FromSeconds(2).TotalMilliseconds);
-            dt.Elapsed += (s, e) => App.Current.Dispatcher.Invoke(() => _models.Add(ModelDataSource.GetRandomModel()));
+            dt.Elapsed += (s, e) => App.Current.Dispatcher.Invoke(() =>
+            {
+                _models.Add(ModelDataSource.GetRandomModel());
+                CommandManager.InvalidateRequerySuggested();
+            });
+
             dt.Start();
         }
     }
