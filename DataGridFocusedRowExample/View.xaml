@@ -34,7 +34,7 @@
             </Border>
         </DockPanel>
         <ItemsControl ItemsSource="{Binding Path=Models}"/>
-
+        <!--Comment out the DockPanel, and uncomment the following line to see a different view of the same data-->
         <!--<DataGrid AutoGenerateColumns="True" ItemsSource="{Binding Path=Models}">
         </DataGrid>-->
     </StackPanel>
